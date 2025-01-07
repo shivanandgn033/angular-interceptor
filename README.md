@@ -1,59 +1,112 @@
-# AngularInterceptor
+In Angular, an interceptor is a powerful tool that allows you to intercept and modify HTTP requests or responses before they are sent to or received from the server. Interceptors are implemented using the HttpInterceptor interface.
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.6.
+Here’s a simple example of creating an HTTP interceptor in Angular 19:
 
-## Development server
+# Steps to Create an Interceptor
 
-To start a local development server, run:
+# 1 Generate the Interceptor:
 
+bash
 ```bash
-ng serve
+ng generate interceptor auth
+```
+This will create auth.interceptor.ts.
+
+ Implement the Interceptor Logic: Modify the generated auth.interceptor.ts to include custom logic.
+
+Example: AuthInterceptor
+This example adds an Authorization header to every outgoing HTTP request.
+
+auth.interceptor.ts
+
+
+```typescript
+import { Injectable } from '@angular/core';
+import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+@Injectable()
+export class AuthInterceptor implements HttpInterceptor {
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    // Clone the request to add the Authorization header
+    const token = 'your-jwt-token'; // Replace with your token logic
+    const authReq = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    console.log('Intercepted HTTP request:', authReq);
+
+    // Pass the cloned request instead of the original
+    return next.handle(authReq);
+  }
+}
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+# 2 Register the Interceptor
+Update the app.config.ts file to include the interceptor.
 
-## Code scaffolding
+app.config.ts
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+```typescript
+import { ApplicationConfig } from '@angular/core';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { AuthInterceptor } from './auth.interceptor';
 
-```bash
-ng generate component component-name
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideHttpClient(
+      withInterceptors([AuthInterceptor]) // Register the interceptor here
+    )
+  ]
+};
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+# 3 Test the Interceptor
 
-```bash
-ng generate --help
+Make an HTTP request to see the interceptor in action.
+
+example.service.ts
+
+```typescript
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ExampleService {
+  constructor(private http: HttpClient) {}
+
+  getData() {
+    return this.http.get('https://api.example.com/data');
+  }
+}
 ```
 
-## Building
+app.component.ts
 
-To build the project run:
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { ExampleService } from './example.service';
 
-```bash
-ng build
+@Component({
+  selector: 'app-root',
+  template: `<h1>Check the Console for Intercepted Request</h1>`
+})
+export class AppComponent implements OnInit {
+  constructor(private exampleService: ExampleService) {}
+
+  ngOnInit() {
+    this.exampleService.getData().subscribe(data => {
+      console.log('Received data:', data);
+    });
+  }
+}
 ```
+Output in Console
+You will see:
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+The intercepted request logged by auth.interceptor.ts.
+The server's response logged by the component.
