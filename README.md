@@ -2,9 +2,9 @@ In Angular, an interceptor is a powerful tool that allows you to intercept and m
 
 Here’s a simple example of creating an HTTP interceptor in Angular 19:
 
-# Steps to Create an Interceptor
+## Steps to Create an Interceptor
 
-# 1 Generate the Interceptor:
+#### 1 Generate the Interceptor:
 
 bash
 ```bash
@@ -44,7 +44,7 @@ export class AuthInterceptor implements HttpInterceptor {
 }
 ```
 
-# 2 Register the Interceptor
+#### 2 Register the Interceptor
 Update the app.config.ts file to include the interceptor.
 
 app.config.ts
@@ -63,7 +63,7 @@ export const appConfig: ApplicationConfig = {
 };
 ```
 
-# 3 Test the Interceptor
+#### 3 Test the Interceptor
 
 Make an HTTP request to see the interceptor in action.
 
