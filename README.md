@@ -2,7 +2,7 @@ In Angular, an interceptor is a powerful tool that allows you to intercept and m
 
 Here’s a simple example of creating an HTTP interceptor in Angular 19:
 
-## Steps to Create an Interceptor
+### Steps to Create an Interceptor
 
 #### 1 Generate the Interceptor:
 
